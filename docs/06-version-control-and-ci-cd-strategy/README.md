@@ -32,6 +32,8 @@ GitHub Actions integrates with AWS using **OIDC**, allowing Innovate Inc. to run
 - The runner has **no public IP** and runs in a **private subnet** with NAT access.
 - CI/CD pipelines promote code between environments: **Dev → Staging → Prod**, with approval gates.
 
+![GitHub Actions Diagram](actions.png)
+
 ---
 
 ### ⚙️ Recommended Runner Configuration
@@ -40,9 +42,9 @@ GitHub Actions integrates with AWS using **OIDC**, allowing Innovate Inc. to run
 |--------------------|--------------------------------------------------|
 | Environment         | EC2 instance (e.g., `t3.medium`) in `innovate-dev` |
 | OS                  | Ubuntu 22.04 LTS                                 |
-| Installation        | Manual or via Terraform                          |
+| Installation        | Manual or via Cloudformation                       |
 | IAM Access          | OIDC-trusted role per environment                |
-| Network             | Private subnet + NAT gateway                     |
+| Network             | Private subnet + Transit gateway                     |
 
 ---
 
