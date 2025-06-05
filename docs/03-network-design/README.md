@@ -1,83 +1,81 @@
-# ✅ Innovate Inc. – Network Design Strategy
+# 🌐 Network Design – Innovate Inc.
+
+## Overview
+
+To support a secure, scalable, and highly available cloud infrastructure, Innovate Inc. employs a well-structured **Virtual Private Cloud (VPC)** design. The architecture adheres to AWS best practices, ensuring robust network segmentation, least-privilege access, and future scalability.
 
 ---
 
-## 🌐 VPC Architecture Overview
+## 🔷 VPC Architecture
 
-Each AWS account (`innovate-dev`, `innovate-staging`, `innovate-prod`) will host its own **dedicated VPC**, designed to provide:
+Each environment (Development, Staging, Production) resides in its own isolated AWS account and contains a dedicated VPC.
 
-- Multi-AZ high availability
-- Network isolation between public-facing and internal services
-- Scalable private infrastructure for EKS, RDS, and supporting services
+### VPC Configuration (per environment):
 
----
-
-### 🧱 VPC Design (per environment)
-
-| Component         | Configuration                                                  |
-|------------------|------------------------------------------------------------------|
-| CIDR Range        | `10.X.0.0/16` (unique per account)                              |
-| Availability Zones | 2 or 3 AZs for high availability                               |
-| Public Subnets    | 1 per AZ, used for NAT Gateway, Load Balancers                 |
-| Private Subnets   | 1 per AZ, used for EKS nodes, RDS, internal services           |
-| NAT Gateway       | 1 per AZ for fault-tolerant outbound internet access           |
-| Internet Gateway  | Attached to VPC for public subnet outbound connectivity         |
-| Route Tables      | Separate per subnet type; tightly controlled routing            |
-| DNS               | Enabled for private hostname resolution (AmazonProvidedDNS)     |
+| Component              | Description                                                                 |
+|------------------------|-----------------------------------------------------------------------------|
+| CIDR Block             | `/16` block (e.g., `10.0.0.0/16`)                                           |
+| Availability Zones     | Spread across 2–3 AZs for high availability                                 |
+| Public Subnets         | `/24` subnets in each AZ for ALBs, NAT Gateways                             |
+| Private Subnets        | `/24` subnets in each AZ for app pods, databases, internal services         |
+| Isolated Subnets       | Optional, for backend services like RDS not needing internet access         |
+| NAT Gateways           | 1 per AZ, enabling outbound access from private subnets                     |
+| Route Tables           | Custom per subnet type (public, private, isolated)                          |
+| VPC Endpoints          | S3, DynamoDB, and optionally others for private service access              |
 
 ---
 
-### 📦 Example CIDR Allocation
+## 🔐 Network Security
 
-| Environment      | VPC CIDR     | AZs         | Public Subnets         | Private Subnets        |
-|------------------|--------------|-------------|-------------------------|-------------------------|
-| Dev              | 10.10.0.0/16 | 2           | 10.10.1.0/24, 10.10.2.0/24 | 10.10.11.0/24, 10.10.12.0/24 |
-| Staging          | 10.20.0.0/16 | 2           | 10.20.1.0/24, 10.20.2.0/24 | 10.20.11.0/24, 10.20.12.0/24 |
-| Production       | 10.30.0.0/16 | 3           | 10.30.1.0/24, 10.30.2.0/24, 10.30.3.0/24 | 10.30.11.0/24, 10.30.12.0/24, 10.30.13.0/24 |
+Security is enforced using multiple layered controls:
 
----
-
-## 🔐 Network Security Controls
-
-### ✅ Security Groups (SGs)
-- **Stateless firewalls** scoped to resources (e.g., EKS, ALB, RDS)
-- Minimal open ports, principle of least privilege
-- Logging via VPC Flow Logs and CloudTrail
-
-### ✅ Network ACLs (NACLs)
-- Enforced at subnet level
-- Used for deny rules and broad protection between subnet zones
-
-### ✅ VPC Endpoints (Interface/Gateway)
-- Used for private access to AWS services (e.g., S3, ECR, Secrets Manager)
-- Avoids routing through the internet for internal data access
+- **Security Groups**: Applied at EC2/EKS pod level, only allowing required traffic.
+- **Network ACLs (NACLs)**: Stateless subnet-level rules as an extra layer.
+- **VPC Flow Logs**: Enabled for monitoring and forensic analysis.
+- **Subnets Separation**: Public-facing components (e.g., ALBs) are strictly isolated from backend resources.
+- **Ingress/Egress Controls**: Only whitelisted ports (e.g., 443 for HTTPS) are opened externally.
 
 ---
 
-## 🚦 High Availability & Fault Tolerance
+## ☁️ Application Load Balancing
 
-- Multi-AZ deployment ensures continuity during AZ outages
-- Subnets are evenly distributed across availability zones
-- NAT Gateways deployed per AZ (not shared) to avoid single points of failure
-
----
-
-## 🔁 Optional: Future Expansion
-
-| Feature                  | Benefit                                                      |
-|--------------------------|--------------------------------------------------------------|
-| **Transit Gateway**      | Simplifies VPC peering and cross-account routing             |
-| **Client VPN**           | Enables secure developer access to private subnets           |
-| **WAF + Shield**         | Protects public-facing services from common threats          |
-| **Private Hosted Zones** | DNS resolution scoped to VPC without public exposure         |
+- **ALB (Application Load Balancer)** is placed in the public subnet.
+- It routes traffic to the Kubernetes Ingress Controller deployed in private subnets.
+- SSL termination is handled at the ALB using **AWS Certificate Manager (ACM)**.
 
 ---
 
-## 📌 Summary
+## 🧩 DNS & Service Discovery
 
-Innovate Inc.'s VPC design provides:
+- **Route 53** is used for DNS management.
+- Internal services may leverage **CoreDNS** inside EKS or **AWS Cloud Map** if needed.
 
-- ✅ Secure, scalable, and highly available infrastructure
-- ✅ Clear separation of public and private services
-- ✅ Built-in support for managed Kubernetes (EKS), RDS, CI/CD pipelines
-- ✅ Foundation for zero-trust security and future network growth
+---
+
+## 🔄 High Availability & Scalability
+
+- **Multi-AZ Subnet Design** ensures resilience against AZ failures.
+- **Kubernetes nodes** and **RDS instances** are spread across zones.
+- **Auto Scaling** (both EC2 and Karpenter) ensures dynamic capacity allocation.
+
+---
+
+## 🔧 Future Enhancements
+
+- **Transit Gateway**: For centralized routing if more accounts or VPCs are added later.
+- **Service Mesh (e.g., AWS App Mesh)**: For fine-grained service communication control.
+- **PrivateLink**: For secure connections to third-party services or internal APIs.
+
+---
+
+## ✅ Summary
+
+The proposed network design enables:
+
+- ✅ Strong isolation between tiers and environments  
+- ✅ High availability across multiple AZs  
+- ✅ Secure ingress/egress control and encrypted traffic flow  
+- ✅ Scalability and flexibility for future growth  
+
+This architecture lays the foundation for a secure and reliable cloud-native application infrastructure for Innovate Inc.
+
