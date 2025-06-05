@@ -40,6 +40,20 @@ While **Terraform** is a powerful and widely adopted Infrastructure-as-Code (IaC
 
 
 
+### 📌 Summary
+
+| Reason                          | Benefit                                                   |
+|---------------------------------|------------------------------------------------------------|
+| AWS-native                      | Fast support for new AWS features                         |
+| Built for serverless            | SAM simplifies Lambda, API Gateway, EventBridge, etc.     |
+| Secure CI/CD                    | GitHub Actions + OIDC = no secrets rotation               |
+| Safe deployments                | Change Sets, rollback, and drift detection                |
+| Enterprise governance           | StackSets, tagging, SCPs, AWS Config integration          |
+
+
+
+---
+
 ## 🧱 Key Infrastructure Components Managed
 
 | Resource Category      | Description                                                                 |
@@ -119,16 +133,3 @@ jobs:
 ✅ Modular templates for scalability and reuse  
 ✅ Secure CI/CD with GitHub Actions + OIDC  
 ✅ Ready for compliance, rollback, and centralized governance  
-
-
----
-
-### 📌 Summary
-
-| Reason                          | Benefit                                                   |
-|---------------------------------|------------------------------------------------------------|
-| AWS-native                      | Fast support for new AWS features                         |
-| Built for serverless            | SAM simplifies Lambda, API Gateway, EventBridge, etc.     |
-| Secure CI/CD                    | GitHub Actions + OIDC = no secrets rotation               |
-| Safe deployments                | Change Sets, rollback, and drift detection                |
-| Enterprise governance           | StackSets, tagging, SCPs, AWS Config integration          |
