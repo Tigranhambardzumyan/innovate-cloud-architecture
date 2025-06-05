@@ -1,6 +1,5 @@
 # ✅ Innovate Inc. – Kubernetes Compute Platform (Amazon EKS)
 
-
 ![EKS Multi-Account Diagram](kube.png)
 
 ---
@@ -44,6 +43,44 @@ Each environment is isolated in its own AWS account and hosts a separate EKS clu
   - System/infra workloads
   - Application workloads (taints/tolerations)
 - `minSize`, `maxSize`, and `desiredSize` managed per use case
+
+---
+
+## 🚀 Introducing Karpenter for Dynamic Scaling
+
+Innovate Inc. leverages **AWS Karpenter** in Production and Development clusters to **automatically provision right-sized nodes** based on real-time workload demands. This complements and, in some cases, replaces the traditional Cluster Autoscaler approach.
+
+### ✅ Why Karpenter?
+
+| Feature                   | Benefit                                                       |
+|---------------------------|---------------------------------------------------------------|
+| Just-in-time provisioning | Instantly launches new nodes tailored to the pod’s needs      |
+| Cost optimization         | Supports Spot + On-Demand mix, lifecycle-aware scheduling     |
+| Reduced complexity        | No need to predefine multiple node groups                    |
+| Flexible instance types   | Selects from a broad range of compatible EC2 types            |
+| Automatic consolidation   | Reclaims underutilized nodes during low-traffic periods       |
+
+---
+
+### 🔧 Karpenter Setup Overview
+
+- **Installed via Helm** with fine-grained IAM permissions (IRSA)
+- Configured with multiple `Provisioners`:
+  - Spot-preferred for `innovate-dev`
+  - Balanced (On-Demand fallback) for `innovate-prod`
+- Taints and labels used to separate system and application pods
+- Consolidation enabled to reduce idle compute costs
+
+---
+
+### 📈 Real-World Usage
+
+| Environment     | Strategy                             | Instance Types Used                   |
+|-----------------|--------------------------------------|----------------------------------------|
+| `innovate-dev`  | Spot-preferred, scale-to-zero        | `t3.medium`, `t3.large`, `m6a.large`   |
+| `innovate-prod` | On-Demand fallback, availability-aware| `c6i.xlarge`, `m6i.large`, `r6a.large` |
+
+Karpenter dynamically scales based on pod specs and scheduling requirements (CPU, memory, topology spread, etc.), making it ideal for cost-effective yet responsive compute provisioning.
 
 ---
 
@@ -98,3 +135,4 @@ Innovate Inc.’s Kubernetes architecture via EKS ensures:
 - ✅ Efficient cost management using Spot and Reserved instances
 - ✅ Flexible workload management using autoscalers and Helm
 - ✅ Secure deployments using OIDC, IRSA, and private networking
+- ✅ Adaptive node provisioning using **AWS Karpenter**
