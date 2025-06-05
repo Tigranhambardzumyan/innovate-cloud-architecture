@@ -28,7 +28,7 @@ A centralized SSO approach powered by Okta:
 ---
 
 
-![OKTA Diagram](OKTA.png)
+![OKTA Diagram](okta.png)
 
 ---
 ## 🔗 Core Application Integrations
